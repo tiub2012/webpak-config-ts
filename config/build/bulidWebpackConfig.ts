@@ -7,23 +7,23 @@ import { buildWebpackDevServer } from "./buildWebpackDevServer"
 import TerserPlugin from 'terser-webpack-plugin'
 
 export function buildWebpackConfig(options: BuildOptions): webpack.Configuration {
-  const { mode, paths } = options
+  const { mode, paths, isDev } = options
 
   return {
     mode,
     entry: paths.entry,
     output: {
-      filename: '[name].[contenthash].js',
+      filename: './js/[name].[contenthash:5].js',
       path: paths.build,
       clean: true
     },
     module: {
-      rules: buildLoaders(),
+      rules: buildLoaders(options),
     },
     resolve: buildResolvers(),
-    devServer: buildWebpackDevServer(),
     plugins: buildPlugins(options),
-    devtool: 'inline-source-map',
+    devtool: isDev ? 'inline-source-map' : undefined,
+    devServer: isDev ? buildWebpackDevServer(options) : undefined,
     optimization: {
       minimize: true,
       minimizer: [new TerserPlugin()],
